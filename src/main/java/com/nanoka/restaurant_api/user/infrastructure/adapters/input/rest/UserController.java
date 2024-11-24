@@ -72,6 +72,14 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/change-password-by-email")
+    public ResponseEntity<String> changePasswordByEmail(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
+        logger.info("Solicitud para cambiar contraseña del usuario con email: {}", email);
+        servicePort.changePasswordByEmail(email, code, newPassword);
+        return ResponseEntity.ok("Contraseña cambiada exitosamente.");
+    }
+
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{id}/enabled")
     public ResponseEntity<String> updateUserEnabledStatus(@PathVariable Long id, @RequestParam @NotNull Boolean isEnabled){
         logger.info("Solicitud para {} usuario con ID: {}", isEnabled ? "habilitar" : "deshabilitar", id);

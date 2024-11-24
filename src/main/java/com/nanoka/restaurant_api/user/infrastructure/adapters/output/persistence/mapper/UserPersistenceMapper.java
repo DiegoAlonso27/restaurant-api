@@ -1,10 +1,11 @@
 package com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence.mapper;
 
-import com.nanoka.restaurant_api.user.domain.model.User;
-import com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence.entity.UserEntity;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 
-import java.util.List;
+import com.nanoka.restaurant_api.user.domain.model.User;
+import com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence.entity.UserEntity;
 
 @Mapper(componentModel = "spring")
 public abstract class UserPersistenceMapper {

@@ -37,6 +37,15 @@ public class UserEntity {
     @Column(nullable = false, name = "document_number")
     private String documentNumber;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(name = "code_expiration_time")
+    private LocalDateTime codeExpirationTime;
+
     private String phone;
 
     @Column(name = "is_enabled")

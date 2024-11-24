@@ -1,8 +1,8 @@
 package com.nanoka.restaurant_api.user.application.ports.input;
 
-import com.nanoka.restaurant_api.user.domain.model.User;
-
 import java.util.List;
+
+import com.nanoka.restaurant_api.user.domain.model.User;
 
 public interface UserServicePort {
     User findById(Long id);
@@ -13,4 +13,5 @@ public interface UserServicePort {
     void delete(Long id);
     void changePassword(String username,String currentPassword, String newPassword);
     void toggleEnabled(Long id, Boolean isEnabled);
+    void changePasswordByEmail(String email, String code, String newPassword);
 }

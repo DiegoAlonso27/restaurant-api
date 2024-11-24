@@ -13,6 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -56,6 +57,11 @@ public class UserService implements UserServicePort {
             throw new ConflictException(ErrorCatelog.USER_DOCUMENT_NUMBER_ALREADY_EXISTS.getMessage());
         });
 
+        // Verificar que el email sea único
+        persistencePort.findByEmail(user.getEmail()).ifPresent(u -> {
+            throw new ConflictException(ErrorCatelog.USER_EMAIL_ALREADY_EXISTS.getMessage());
+        });
+
         // Colocar los datos por defecto
         user.setPassword(passwordEncoder.encode("password"));
         user.setIsEnabled(true);
@@ -81,6 +87,11 @@ public class UserService implements UserServicePort {
                 .filter(u -> !u.getDocumentNumber().equals(existingUser.getDocumentNumber()))
                 .ifPresent(u -> { throw new ConflictException(ErrorCatelog.USER_DOCUMENT_NUMBER_ALREADY_EXISTS.getMessage()); });
 
+        // Verificar que el email sea único
+        persistencePort.findByEmail(user.getEmail())
+                .filter(u -> !u.getEmail().equals(existingUser.getEmail()))
+                .ifPresent(u -> { throw new ConflictException(ErrorCatelog.USER_EMAIL_ALREADY_EXISTS.getMessage()); });
+
         // Guardar datos en memoria
         existingUser.setUsername(user.getUsername());
         existingUser.setName(user.getName());
@@ -88,6 +99,7 @@ public class UserService implements UserServicePort {
         existingUser.setDocumentType(user.getDocumentType());
         existingUser.setDocumentNumber(user.getDocumentNumber());
         existingUser.setRole(user.getRole());
+        existingUser.setEmail(user.getEmail());
 
         // Persistir los datos en la BD
         return persistencePort.save(existingUser);
@@ -113,6 +125,20 @@ public class UserService implements UserServicePort {
                     return persistencePort.save(user);
                 })
                 .orElseThrow(() -> new BadCredentialsException(ErrorCatelog.BAD_CREDENTIALS.getMessage()));
+    }
+
+    @Override
+    public void changePasswordByEmail(String email, String code, String newPassword) {
+        logger.info("Cambiando contraseña para el usuario con email: {}", email);
+        User user = persistencePort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCatelog.USER_NOT_FOUND.getMessage()));
+
+        if (!user.getVerificationCode().equals(code) || user.getCodeExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new BadCredentialsException(ErrorCatelog.INVALID_VERIFICATION_CODE.getMessage());
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        persistencePort.save(user);
     }
 
     @Override

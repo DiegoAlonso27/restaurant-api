@@ -1,14 +1,16 @@
 package com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.nanoka.restaurant_api.user.application.ports.output.UserPersistencePort;
 import com.nanoka.restaurant_api.user.domain.model.User;
 import com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence.mapper.UserPersistenceMapper;
 import com.nanoka.restaurant_api.user.infrastructure.adapters.output.persistence.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +34,12 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     @Override
     public Optional<User> findByDocumentNumber(String documentNumber) {
         return repository.findByDocumentNumber(documentNumber)
+                .map(mapper::toUser);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return repository.findByEmail(email)
                 .map(mapper::toUser);
     }
 
